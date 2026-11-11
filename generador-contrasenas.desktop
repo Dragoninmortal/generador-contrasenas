@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Generador de Contraseñas
+Name[en]=Password Generator
+Comment=Genera contraseñas combinando tus datos con aleatoriedad segura
+Comment[en]=Generate passwords by combining your data with secure randomness
+Exec=/home/diego/generador-contrasenas/generador.py
+Icon=/home/diego/generador-contrasenas/icono.svg
+Terminal=false
+Categories=Utility;Security;System;
+Keywords=password;contraseña;generador;seguridad;security;
+StartupNotify=true

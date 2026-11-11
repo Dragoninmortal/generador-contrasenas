@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Diccionarios / wordlists generados (no conviene subirlos)
+diccionario.txt
+palabras.txt
+*.wordlist
+*.dict
+
+# Sistema
+.DS_Store
+Thumbs.db

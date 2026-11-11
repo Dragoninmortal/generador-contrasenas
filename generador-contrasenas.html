@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generador de Contraseñas</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --panel: #1e293b;
+    --panel-2: #273449;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --accent: #38bdf8;
+    --accent-2: #0ea5e9;
+    --border: #334155;
+    --ok: #22c55e;
+    --warn: #f59e0b;
+    --bad: #ef4444;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: radial-gradient(circle at 20% 0%, #1e3a5f 0%, var(--bg) 55%);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    color: var(--text);
+  }
+  .card {
+    width: 100%;
+    max-width: 560px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 26px;
+    box-shadow: 0 20px 50px rgba(0,0,0,.45);
+  }
+  h1 { font-size: 1.35rem; margin: 0 0 4px; }
+  .sub { color: var(--muted); font-size: .85rem; margin: 0 0 22px; }
+  .field { margin-bottom: 14px; }
+  label { display: block; font-size: .8rem; color: var(--muted); margin-bottom: 6px; }
+  input[type="text"], input[type="date"], input[type="number"] {
+    width: 100%;
+    padding: 11px 12px;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-size: .95rem;
+    outline: none;
+    transition: border-color .15s;
+  }
+  input:focus { border-color: var(--accent); }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 16px;
+    margin: 18px 0;
+    padding: 16px;
+    background: var(--panel-2);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+  }
+  .check { display: flex; align-items: center; gap: 8px; font-size: .88rem; cursor: pointer; }
+  .check input { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; }
+  .range-row { display: flex; align-items: center; gap: 12px; margin-top: 4px; }
+  input[type="range"] { flex: 1; accent-color: var(--accent); }
+  .len-val { font-variant-numeric: tabular-nums; font-weight: 600; min-width: 28px; text-align: right; }
+  button {
+    width: 100%;
+    padding: 13px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #04263a;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform .08s, filter .15s;
+  }
+  button:hover { filter: brightness(1.08); }
+  button:active { transform: scale(.98); }
+  .result {
+    margin-top: 20px;
+    display: none;
+  }
+  .result.show { display: block; }
+  .pw-box {
+    display: flex;
+    gap: 8px;
+    align-items: stretch;
+  }
+  .pw {
+    flex: 1;
+    padding: 14px;
+    background: #0b1220;
+    border: 1px dashed var(--border);
+    border-radius: 10px;
+    font-family: ui-monospace, "SF Mono", Consolas, monospace;
+    font-size: 1.1rem;
+    word-break: break-all;
+    letter-spacing: .5px;
+    user-select: all;
+  }
+  .copy {
+    width: auto;
+    padding: 0 16px;
+    background: var(--panel-2);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .copy:hover { filter: none; background: var(--border); }
+  .strength { margin-top: 12px; }
+  .bar { height: 7px; background: var(--panel-2); border-radius: 4px; overflow: hidden; }
+  .bar span { display: block; height: 100%; width: 0; transition: width .3s, background .3s; }
+  .strength-text { font-size: .8rem; color: var(--muted); margin-top: 6px; display: flex; justify-content: space-between; }
+  .note {
+    margin-top: 18px;
+    font-size: .75rem;
+    color: var(--muted);
+    line-height: 1.5;
+    border-top: 1px solid var(--border);
+    padding-top: 14px;
+  }
+  @media (max-width: 480px) {
+    .grid, .options { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>🔐 Generador de Contraseñas</h1>
+    <p class="sub">Rellena los datos que quieras usar como base y el sistema los combina con aleatoriedad para crear la contraseña.</p>
+
+    <div class="grid">
+      <div class="field">
+        <label for="nombre">Nombre o usuario</label>
+        <input type="text" id="nombre" placeholder="p. ej. Diego" autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="fecha">Fecha relevante</label>
+        <input type="date" id="fecha">
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="field">
+        <label for="palabra">Palabra clave o frase</label>
+        <input type="text" id="palabra" placeholder="p. ej. montaña azul" autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="numero">Número o teléfono</label>
+        <input type="text" id="numero" placeholder="p. ej. 2026" inputmode="numeric" autocomplete="off">
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="longitud">Longitud de la contraseña: <span class="len-val" id="lenVal">16</span></label>
+      <div class="range-row">
+        <input type="range" id="longitud" min="8" max="40" value="16">
+      </div>
+    </div>
+
+    <div class="options">
+      <label class="check"><input type="checkbox" id="optMayus" checked> Mayúsculas (A-Z)</label>
+      <label class="check"><input type="checkbox" id="optMinus" checked> Minúsculas (a-z)</label>
+      <label class="check"><input type="checkbox" id="optNums" checked> Números (0-9)</label>
+      <label class="check"><input type="checkbox" id="optSimb" checked> Símbolos (!@#$)</label>
+      <label class="check"><input type="checkbox" id="optLeet"> Sustituir letras (a→4, e→3)</label>
+      <label class="check"><input type="checkbox" id="optDatos" checked> Incluir mis datos</label>
+    </div>
+
+    <button id="btnGenerar">Generar contraseña</button>
+
+    <div class="result" id="resultado">
+      <div class="pw-box">
+        <div class="pw" id="pw">—</div>
+        <button class="copy" id="btnCopiar" title="Copiar">📋</button>
+      </div>
+      <div class="strength">
+        <div class="bar"><span id="barra"></span></div>
+        <div class="strength-text">
+          <span id="fuerzaTexto">—</span>
+          <span id="entropia">—</span>
+        </div>
+      </div>
+    </div>
+
+    <p class="note">
+      Consejo de seguridad: aunque la contraseña incluya tus datos, siempre se añade una parte aleatoria.
+      Para cuentas importantes usa contraseñas 100 % aleatorias y únicas, y guárdalas en un gestor de contraseñas.
+    </p>
+  </div>
+
+<script>
+(function () {
+  "use strict";
+
+  var SETS = {
+    mayus: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+    minus: "abcdefghijklmnopqrstuvwxyz",
+    nums: "0123456789",
+    simb: "!@#$%^&*()-_=+[]{};:,.?/"
+  };
+
+  var LEET = { a: "4", e: "3", i: "1", o: "0", s: "5", t: "7", b: "8", g: "9" };
+
+  var $ = function (id) { return document.getElementById(id); };
+
+  // Aleatoriedad segura cuando el navegador la ofrece
+  function randomInt(max) {
+    if (window.crypto && window.crypto.getRandomValues) {
+      var arr = new Uint32Array(1);
+      var limit = Math.floor(0xFFFFFFFF / max) * max;
+      var x;
+      do { window.crypto.getRandomValues(arr); x = arr[0]; } while (x >= limit);
+      return x % max;
+    }
+    return Math.floor(Math.random() * max);
+  }
+
+  function pick(str) { return str[randomInt(str.length)]; }
+
+  function shuffle(arr) {
+    for (var i = arr.length - 1; i > 0; i--) {
+      var j = randomInt(i + 1);
+      var t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+    }
+    return arr;
+  }
+
+  function toLeet(s) {
+    return s.replace(/[aeiostbgAEIOSTBG]/g, function (c) {
+      var l = LEET[c.toLowerCase()];
+      if (!l) return c;
+      return c === c.toUpperCase() ? l : l;
+    });
+  }
+
+  // Convierte los datos introducidos en un "trocito" usable
+  function buildDataChunk() {
+    var parts = [];
+    var nombre = $("nombre").value.trim();
+    var palabra = $("palabra").value.trim();
+    var numero = $("numero").value.trim();
+    var fecha = $("fecha").value;
+
+    if (nombre) parts.push(nombre.replace(/\s+/g, ""));
+    if (palabra) parts.push(palabra.replace(/\s+/g, ""));
+    if (numero) parts.push(numero.replace(/\D/g, ""));
+    if (fecha) {
+      var p = fecha.split("-"); // yyyy-mm-dd
+      if (p.length === 3) parts.push(p[2] + p[1] + p[0].slice(2)); // ddmmyy
+    }
+
+    var chunk = parts.join("");
+    if ($("optLeet").checked && chunk) chunk = toLeet(chunk);
+    return chunk;
+  }
+
+  function activeSets() {
+    var sets = [];
+    if ($("optMayus").checked) sets.push(SETS.mayus);
+    if ($("optMinus").checked) sets.push(SETS.minus);
+    if ($("optNums").checked) sets.push(SETS.nums);
+    if ($("optSimb").checked) sets.push(SETS.simb);
+    return sets;
+  }
+
+  function generate() {
+    var length = parseInt($("longitud").value, 10);
+    var sets = activeSets();
+    var pool = sets.join("");
+
+    if (pool.length === 0) {
+      alert("Selecciona al menos un tipo de carácter (mayúsculas, minúsculas, números o símbolos).");
+      return null;
+    }
+
+    var chars = [];
+
+    // 1) Parte basada en los datos del usuario
+    if ($("optDatos").checked) {
+      var chunk = buildDataChunk();
+      if (chunk) {
+        // usa como máximo ~55% de la longitud para no sacrificar aleatoriedad
+        var maxData = Math.max(1, Math.floor(length * 0.55));
+        chunk = chunk.slice(0, maxData);
+        for (var i = 0; i < chunk.length; i++) chars.push(chunk[i]);
+      }
+    }
+
+    // 2) Garantiza al menos un carácter de cada tipo seleccionado
+    for (var s = 0; s < sets.length && chars.length < length; s++) {
+      chars.push(pick(sets[s]));
+    }
+
+    // 3) Rellena el resto con aleatoriedad del conjunto completo
+    while (chars.length < length) chars.push(pick(pool));
+
+    // 4) Recorta si los datos ya ocupaban demasiado
+    chars = chars.slice(0, length);
+
+    shuffle(chars);
+    return chars.join("");
+  }
+
+  function estimateStrength(pw) {
+    var poolSize = 0;
+    if (/[a-z]/.test(pw)) poolSize += 26;
+    if (/[A-Z]/.test(pw)) poolSize += 26;
+    if (/[0-9]/.test(pw)) poolSize += 10;
+    if (/[^a-zA-Z0-9]/.test(pw)) poolSize += 25;
+    var bits = poolSize > 0 ? pw.length * Math.log2(poolSize) : 0;
+    return Math.round(bits);
+  }
+
+  function showResult(pw) {
+    $("pw").textContent = pw;
+    $("resultado").classList.add("show");
+
+    var bits = estimateStrength(pw);
+    var pct = Math.min(100, Math.round((bits / 128) * 100));
+    var color, label;
+    if (bits < 45) { color = "var(--bad)"; label = "Débil"; }
+    else if (bits < 70) { color = "var(--warn)"; label = "Aceptable"; }
+    else if (bits < 100) { color = "var(--ok)"; label = "Fuerte"; }
+    else { color = "var(--ok)"; label = "Muy fuerte"; }
+
+    var barra = $("barra");
+    barra.style.width = pct + "%";
+    barra.style.background = color;
+    $("fuerzaTexto").textContent = "Seguridad: " + label;
+    $("entropia").textContent = "~" + bits + " bits";
+  }
+
+  // Eventos
+  $("longitud").addEventListener("input", function () {
+    $("lenVal").textContent = this.value;
+  });
+
+  $("btnGenerar").addEventListener("click", function () {
+    var pw = generate();
+    if (pw) showResult(pw);
+  });
+
+  $("btnCopiar").addEventListener("click", function () {
+    var texto = $("pw").textContent;
+    if (!texto || texto === "—") return;
+    var btn = this;
+    var done = function () {
+      btn.textContent = "✅";
+      setTimeout(function () { btn.textContent = "📋"; }, 1200);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(texto).then(done).catch(function () { fallbackCopy(texto, done); });
+    } else {
+      fallbackCopy(texto, done);
+    }
+  });
+
+  function fallbackCopy(texto, done) {
+    var ta = document.createElement("textarea");
+    ta.value = texto;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand("copy"); done(); } catch (e) {}
+    document.body.removeChild(ta);
+  }
+})();
+</script>
+</body>
+</html>
