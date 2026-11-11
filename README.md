@@ -92,3 +92,7 @@ gestor de contraseñas (KeePassXC viene incluido en Parrot).
 rm -f ~/.local/share/applications/generador-contrasenas.desktop
 rm -rf ~/generador-contrasenas
 ```
+
+## Licencia
+
+Este proyecto está bajo la licencia **MIT**. Consulta el archivo [LICENSE](LICENSE).
