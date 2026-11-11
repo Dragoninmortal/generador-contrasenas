@@ -9,7 +9,8 @@ con **aleatoriedad criptográfica** para crear la contraseña.
 |---|---|
 | `generador.py` | App de escritorio nativa (Python + Tkinter). **Sin dependencias.** |
 | `diccionario.py` | Generador de diccionarios (wordlist) estilo CUPP. Módulo + CLI. |
-| `generador-contrasenas.desktop` | Lanzador para el menú de aplicaciones. |
+| `instalar.sh` | Instalador del lanzador de menú (usa tu `$HOME`). |
+| `generador-contrasenas.desktop` | Lanzador genérico (usa `$HOME`) para el menú. |
 | `icono.svg` | Icono de la aplicación. |
 | `generador-contrasenas.html` | Versión web (opcional), abre en Firefox. |
 
@@ -26,6 +27,22 @@ o directamente:
 ```bash
 ~/generador-contrasenas/generador.py
 ```
+
+## Instalar desde GitHub (para cualquier usuario)
+
+```bash
+git clone https://github.com/Dragoninmortal/generador-contrasenas.git ~/generador-contrasenas
+cd ~/generador-contrasenas
+./instalar.sh
+```
+
+`instalar.sh` copia el icono al tema del usuario y crea el lanzador en
+`~/.local/share/applications/` con la **ruta real** de tu equipo. Después aparecerá
+"Generador de Contraseñas" en el menú.
+
+> El `.desktop` incluido en el repo es **genérico** y usa `$HOME`, por lo que también
+> funciona copiándolo a mano a `~/.local/share/applications/` **siempre que** hayas clonado
+> el repositorio en `~/generador-contrasenas`. Si lo clonas en otra ruta, usa `./instalar.sh`.
 
 ## Qué hace
 
@@ -90,6 +107,7 @@ gestor de contraseñas (KeePassXC viene incluido en Parrot).
 
 ```bash
 rm -f ~/.local/share/applications/generador-contrasenas.desktop
+rm -f ~/.local/share/icons/hicolor/scalable/apps/generador-contrasenas.svg
 rm -rf ~/generador-contrasenas
 ```
 
